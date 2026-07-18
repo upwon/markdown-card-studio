@@ -1,5 +1,24 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+
+async function minimumEditorContrast(page: Page) {
+  return page.locator(".cm-editor").evaluate((editor) => {
+    const parseRgb = (color: string) => color.match(/[\d.]+/g)!.slice(0, 3).map(Number);
+    const luminance = (rgb: number[]) => rgb
+      .map((channel) => channel / 255)
+      .map((channel) => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4)
+      .reduce((sum, channel, index) => sum + channel * [0.2126, 0.7152, 0.0722][index], 0);
+    const background = parseRgb(getComputedStyle(editor.closest(".editor-pane")!).backgroundColor);
+    const backgroundLuminance = luminance(background);
+    const nodes = [editor, ...editor.querySelectorAll(".cm-line span")];
+    return Math.min(...nodes.map((node) => {
+      const foregroundLuminance = luminance(parseRgb(getComputedStyle(node).color));
+      return (Math.max(backgroundLuminance, foregroundLuminance) + 0.05)
+        / (Math.min(backgroundLuminance, foregroundLuminance) + 0.05);
+    }));
+  });
+}
 
 test.beforeEach(async ({ page }) => {
   page.on("pageerror", (error) => console.error(`PAGE ERROR: ${error.message}`));
@@ -45,6 +64,17 @@ test("switches the application appearance and persists the choice", async ({ pag
   await page.reload();
   await expect(page.locator(".studio-shell")).toHaveAttribute("data-app-theme", "light");
   await expect(page.getByRole("button", { name: "切换到深色界面" })).toBeVisible();
+});
+
+test("keeps Markdown syntax readable in both application appearances", async ({ page }) => {
+  const editor = page.locator(".cm-content");
+  await editor.click();
+  await page.keyboard.press(process.platform === "darwin" ? "Meta+A" : "Control+A");
+  await page.keyboard.insertText("# 清晰标题\n\n> 清晰引用\n\n普通正文、**重点文字**、[清晰链接](https://example.com) 和 `代码`。\n\n---");
+
+  await expect.poll(() => minimumEditorContrast(page)).toBeGreaterThanOrEqual(4.5);
+  await page.getByRole("button", { name: "切换到浅色界面" }).click();
+  await expect.poll(() => minimumEditorContrast(page)).toBeGreaterThanOrEqual(4.5);
 });
 
 test("keeps a long pasted Markdown document independently scrollable", async ({ page, isMobile }) => {

@@ -53,7 +53,7 @@ button { color: inherit; }
 .toolbar-group { display: flex; gap: 3px; }.icon-button { width: 28px; height: 28px; padding: 0; background: transparent; border-color: transparent; color: #9ba5b5; }.toolbar-divider { width: 1px; height: 18px; background: #2a303a; margin: 0 3px; }.save-state { margin-left: auto; white-space: nowrap; color: #758092; font-size: 9px; }.save-state i { display: inline-block; width: 5px; height: 5px; margin-right: 4px; border-radius: 50%; background: #58c28d; }
 .editor-surface { min-height: 0; height: 100%; overflow: hidden; position: relative; }
 .editor-surface > div { height: 100%; min-height: 0; overflow: hidden; }
-.editor-surface .cm-editor { height: 100%; min-height: 0; overflow: hidden; color: #cdd4df; }
+.editor-surface .cm-editor { height: 100%; min-height: 0; overflow: hidden; color: inherit; }
 .editor-surface .cm-focused { outline: none; }
 .editor-surface .cm-scroller { height: 100%; min-height: 0; overflow: auto !important; overscroll-behavior: contain; scrollbar-gutter: stable; touch-action: pan-y; scrollbar-color: rgba(139, 148, 165, .72) transparent; scrollbar-width: auto; }
 .editor-surface .cm-scroller::-webkit-scrollbar { width: 13px; height: 13px; }

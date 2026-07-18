@@ -5,7 +5,9 @@ import dynamic from "next/dynamic";
 import { markdown as markdownLanguage } from "@codemirror/lang-markdown";
 import { defaultKeymap, history, historyKeymap, indentWithTab, redo, undo } from "@codemirror/commands";
 import { searchKeymap } from "@codemirror/search";
+import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { EditorView, keymap, lineNumbers } from "@codemirror/view";
+import { tags } from "@lezer/highlight";
 import type { EditorView as EditorViewType } from "@codemirror/view";
 import { Bold, Code2, Heading2, Italic, Link, List, ListOrdered, Quote, Redo2, SeparatorHorizontal, Undo2 } from "lucide-react";
 import { useStudioStore } from "@/store/use-studio-store";
@@ -29,20 +31,37 @@ export function MarkdownEditor({ saveStatus }: { saveStatus: string }) {
   const setMarkdown = useStudioStore((state) => state.setMarkdown);
   const appearance = useStudioStore((state) => state.settings.appearance ?? "dark");
   const editorRef = useRef<EditorViewType | null>(null);
-  const extensions = useMemo(() => [
-    lineNumbers(), history(), markdownLanguage(),
-    keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, indentWithTab]),
-    EditorView.lineWrapping,
-    EditorView.theme({
-      "&": { height: "100%", minHeight: "0", backgroundColor: "transparent", color: appearance === "light" ? "#343942" : "#cdd4df", fontSize: "14px" },
-      ".cm-scroller": { fontFamily: '"Geist Mono", ui-monospace, monospace', lineHeight: "1.7", overflow: "auto", overscrollBehavior: "contain", scrollbarGutter: "stable", touchAction: "pan-y" },
-      ".cm-content": { padding: "22px 12px 120px" },
-      ".cm-gutters": { backgroundColor: "transparent", borderRight: `1px solid ${appearance === "light" ? "#d7dce5" : "#262a33"}`, color: appearance === "light" ? "#9aa2af" : "#596170" },
-      ".cm-activeLine, .cm-activeLineGutter": { backgroundColor: appearance === "light" ? "rgba(40,75,130,.055)" : "rgba(255,255,255,.035)" },
-      ".cm-cursor": { borderLeftColor: appearance === "light" ? "#245edb" : "#82aaff" },
-      ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": { backgroundColor: `${appearance === "light" ? "#cbdcf8" : "#28476e"} !important` },
-    }),
-  ], [appearance]);
+  const extensions = useMemo(() => {
+    const palette = appearance === "light"
+      ? { text: "#27313d", heading: "#182331", muted: "#657184", accent: "#2457c5", quote: "#48566a", code: "#8a3b12" }
+      : { text: "#e1e7ef", heading: "#f5f7fb", muted: "#a6b0bf", accent: "#91b4ff", quote: "#c5ceda", code: "#f2bb7d" };
+    const markdownHighlightStyle = HighlightStyle.define([
+      { tag: tags.content, color: palette.text },
+      { tag: tags.heading, color: palette.heading, fontWeight: "700" },
+      { tag: tags.strong, color: palette.heading, fontWeight: "700" },
+      { tag: tags.emphasis, color: palette.text, fontStyle: "italic" },
+      { tag: tags.quote, color: palette.quote },
+      { tag: [tags.link, tags.url], color: palette.accent, textDecoration: "underline" },
+      { tag: tags.monospace, color: palette.code },
+      { tag: [tags.meta, tags.punctuation, tags.contentSeparator, tags.list], color: palette.muted },
+      { tag: tags.strikethrough, color: palette.muted, textDecoration: "line-through" },
+    ]);
+
+    return [
+      lineNumbers(), history(), markdownLanguage(), syntaxHighlighting(markdownHighlightStyle),
+      keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, indentWithTab]),
+      EditorView.lineWrapping,
+      EditorView.theme({
+        "&": { height: "100%", minHeight: "0", backgroundColor: "transparent", color: palette.text, fontSize: "14px" },
+        ".cm-scroller": { fontFamily: '"Geist Mono", ui-monospace, monospace', lineHeight: "1.7", overflow: "auto", overscrollBehavior: "contain", scrollbarGutter: "stable", touchAction: "pan-y" },
+        ".cm-content": { padding: "22px 12px 120px", caretColor: palette.accent },
+        ".cm-gutters": { backgroundColor: "transparent", borderRight: `1px solid ${appearance === "light" ? "#d7dce5" : "#262a33"}`, color: appearance === "light" ? "#7c8797" : "#8994a5" },
+        ".cm-activeLine, .cm-activeLineGutter": { backgroundColor: appearance === "light" ? "rgba(40,75,130,.055)" : "rgba(255,255,255,.045)" },
+        ".cm-cursor": { borderLeftColor: palette.accent },
+        ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": { backgroundColor: `${appearance === "light" ? "#cbdcf8" : "#28476e"} !important` },
+      }),
+    ];
+  }, [appearance]);
 
   const insert = useCallback((before: string, after: string, placeholder: string) => {
     const view = editorRef.current;
@@ -73,7 +92,7 @@ export function MarkdownEditor({ saveStatus }: { saveStatus: string }) {
         <span className="save-state"><i /> {saveStatus}</span>
       </div>
       <div className="editor-surface" data-testid="markdown-editor">
-        <CodeMirror value={markdown} height="100%" extensions={extensions} onChange={setMarkdown} onCreateEditor={(view) => { editorRef.current = view; }} basicSetup={{ foldGutter: true, highlightActiveLine: true, bracketMatching: true, closeBrackets: true }} />
+        <CodeMirror value={markdown} height="100%" extensions={extensions} onChange={setMarkdown} onCreateEditor={(view) => { editorRef.current = view; }} basicSetup={{ foldGutter: true, highlightActiveLine: true, bracketMatching: true, closeBrackets: true, syntaxHighlighting: false }} />
       </div>
     </section>
   );
