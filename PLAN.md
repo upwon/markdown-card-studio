@@ -1,8 +1,8 @@
 # Markdown Card Studio — MVP 实施计划
 
-> 状态：MVP 已实现并通过本地验收，等待生产部署
+> 状态：MVP 已实现、通过验收并完成生产部署
 >
-> 用户已确认实施。代码、自动化测试与本地浏览器验证已经完成；Vercel 生产状态将在上线后更新。
+> 用户已确认实施。代码、自动化测试、本地与生产浏览器验证均已完成。
 
 ## 1. 项目目标
 
@@ -14,7 +14,7 @@
 
 - GitHub：`upwon/markdown-card-studio`（公开仓库）
 - 本地目录：`/Users/lifeee/code_project/markdown-card-studio`
-- 生产部署：新建独立 Vercel 项目 `markdown-card-studio`
+- 生产部署：`https://markdown-card-studio.vercel.app`
 - 旧项目 `upwon/Hank-xhs-md-tool`：仅作只读参考，禁止修改、提交、推送或重新部署
 
 ## 2. MVP 范围
