@@ -19,6 +19,7 @@ interface StudioState {
 
 const defaultSettings: StudioSettings = {
   appearance: "dark",
+  paginationMode: "auto",
   themeId: "classic-cream",
   templateId: "deep-reading",
   fontSize: 30,
@@ -57,7 +58,7 @@ export const useStudioStore = create<StudioState>()(
           hydrated: true,
         };
       },
-      version: 2,
+      version: 3,
     },
   ),
 );

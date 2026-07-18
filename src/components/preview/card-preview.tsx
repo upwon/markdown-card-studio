@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { getTemplate } from "@/config/templates";
 import { getTheme } from "@/config/themes";
 import { parseMarkdown } from "@/core/markdown/parse";
-import { paginateBlocks } from "@/core/pagination/paginate";
+import { paginateBlocks, splitOversizedBlocks } from "@/core/pagination/paginate";
 import { useStudioStore } from "@/store/use-studio-store";
 import type { MarkdownBlock } from "@/types/studio";
 import { MarkdownContent } from "./markdown-content";
@@ -31,6 +31,15 @@ export function CardPreview({ onPageCount }: { onPageCount: (count: number) => v
   const theme = getTheme(settings.themeId);
   const template = getTemplate(settings.templateId);
   const accent = settings.accentOverride || theme.accent;
+  const paginationMode = settings.paginationMode ?? "auto";
+
+  const flowBlocks = useMemo(() => paginationMode === "auto"
+    ? splitOversizedBlocks(blocks, {
+      capacity: template.contentHeight,
+      fontSize: settings.fontSize,
+      lineHeight: settings.lineHeight,
+    })
+    : blocks, [blocks, paginationMode, settings.fontSize, settings.lineHeight, template.contentHeight]);
 
   const style = useMemo<CardStyle>(() => ({
     "--card-paper": theme.paper,
@@ -54,13 +63,14 @@ export function CardPreview({ onPageCount }: { onPageCount: (count: number) => v
     "--card-heading-scale": String(template.headingScale),
   }), [accent, settings, template, theme]);
 
-  const pages = useMemo(() => paginateBlocks(blocks, {
+  const pages = useMemo(() => paginateBlocks(flowBlocks, {
     capacity: template.contentHeight,
     gap: template.blockGap,
     heights,
     fontSize: settings.fontSize,
     lineHeight: settings.lineHeight,
-  }), [blocks, heights, settings.fontSize, settings.lineHeight, template]);
+    mode: paginationMode,
+  }), [flowBlocks, heights, paginationMode, settings.fontSize, settings.lineHeight, template]);
 
   useLayoutEffect(() => {
     const root = measureRef.current;
@@ -84,7 +94,7 @@ export function CardPreview({ onPageCount }: { onPageCount: (count: number) => v
     const observer = new ResizeObserver(measure);
     observer.observe(root);
     return () => { cancelled = true; observer.disconnect(); };
-  }, [blocks, style]);
+  }, [flowBlocks, style]);
 
   useEffect(() => {
     onPageCount(pages.length);
@@ -95,7 +105,7 @@ export function CardPreview({ onPageCount }: { onPageCount: (count: number) => v
     <div className="preview-stage" data-testid="preview-stage">
       <div className="measure-stage" aria-hidden ref={measureRef} style={style}>
         <div className="card-measure-content">
-          {blocks.filter((block) => !block.forceBreak).map((block) => (
+          {flowBlocks.filter((block) => !block.forceBreak).map((block) => (
             <div className="markdown-block" data-block-type={block.type} data-measure-id={block.id} key={block.id}>
               <MarkdownContent source={block.source} />
             </div>
@@ -109,7 +119,7 @@ export function CardPreview({ onPageCount }: { onPageCount: (count: number) => v
               <header className="card-header"><span className="card-column">{settings.column}</span><span className="card-mark"><i /> M</span></header>
               <main className="card-content"><CardBody blocks={page.blocks} /></main>
               <footer className="card-footer"><span>{settings.account}</span><span>{String(index + 1).padStart(2, "0")} / {String(pages.length).padStart(2, "0")}</span></footer>
-              {page.overflow && <span className="overflow-badge">内容块过高，请调小字号</span>}
+              {page.overflow && <span className="overflow-badge">{paginationMode === "manual" ? "本页内容超出卡片，请插入分页符" : "单个内容块过高，请拆分内容或调小字号"}</span>}
             </article>
           </button>
         ))}

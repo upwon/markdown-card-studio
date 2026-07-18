@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Palette, SlidersHorizontal, Type } from "lucide-react";
+import { Check, Files, Palette, SlidersHorizontal, Type } from "lucide-react";
 import { templates } from "@/config/templates";
 import { themes } from "@/config/themes";
 import { useStudioStore } from "@/store/use-studio-store";
@@ -17,6 +17,14 @@ export function SettingsPanel() {
   return (
     <aside className="settings-panel" aria-label="样式设置">
       <div className="settings-heading"><span className="brand-glyph">M</span><div><strong>Markdown</strong><small>Card Studio</small></div></div>
+      <section className="setting-section">
+        <h2><Files size={15} /> 分页方式</h2>
+        <div className="pagination-mode" role="group" aria-label="分页方式">
+          <button type="button" className={settings.paginationMode !== "manual" ? "is-selected" : ""} onClick={() => update("paginationMode", "auto")}><strong>自动分页</strong><small>根据卡片高度自动换页</small></button>
+          <button type="button" className={settings.paginationMode === "manual" ? "is-selected" : ""} onClick={() => update("paginationMode", "manual")}><strong>手动分页</strong><small>仅按分页符生成新页面</small></button>
+        </div>
+        <p className="pagination-hint">手动分页符：<code>&lt;!-- pagebreak --&gt;</code></p>
+      </section>
       <section className="setting-section">
         <h2><SlidersHorizontal size={15} /> 排版模板</h2>
         <div className="template-list">{templates.map((template) => <button type="button" key={template.id} className={`template-option ${settings.templateId === template.id ? "is-selected" : ""}`} onClick={() => update("templateId", template.id)}><span><strong>{template.name}</strong><small>{template.description}</small></span>{settings.templateId === template.id && <Check size={16} />}</button>)}</div>

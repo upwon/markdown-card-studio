@@ -6,6 +6,8 @@ A local-first Markdown editor for creating beautifully paginated 3:4 social medi
 
 - CodeMirror 6 Markdown editing with formatting shortcuts
 - Live 900 × 1200 card preview and automatic pagination
+- Automatic height-based pagination or manual page-break-only mode
+- Safe splitting for oversized prose and list blocks
 - Explicit page breaks with `<!-- pagebreak -->`
 - Two typography templates and eight light/dark themes
 - Persistent light/dark application appearance, independent of card themes

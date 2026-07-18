@@ -96,6 +96,28 @@ test("keeps a long pasted Markdown document independently scrollable", async ({ 
   await expect.poll(() => scroller.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
 });
 
+test("switches between automatic and page-break-only pagination", async ({ page, isMobile }) => {
+  test.skip(Boolean(isMobile), "desktop pagination controls verification");
+  const editor = page.locator(".cm-content");
+  const listItems = Array.from({ length: 14 }, (_, index) => `- 第 ${index + 1} 项：这是一段用于验证分页和自动换行的完整内容。`);
+  await editor.click();
+  await page.keyboard.press(process.platform === "darwin" ? "Meta+A" : "Control+A");
+  await page.keyboard.insertText(listItems.join("\n"));
+
+  await expect.poll(() => page.locator("[data-export-card]").count()).toBeGreaterThan(1);
+  await expect(page.locator(".overflow-badge")).toHaveCount(0);
+
+  await page.getByRole("button", { name: /手动分页/ }).click();
+  await expect(page.locator("[data-export-card]")).toHaveCount(1);
+  await expect(page.locator(".overflow-badge")).toContainText("请插入分页符");
+
+  await editor.click();
+  await page.keyboard.press(process.platform === "darwin" ? "Meta+A" : "Control+A");
+  await page.keyboard.insertText(`${listItems.slice(0, 7).join("\n")}\n\n<!-- pagebreak -->\n\n${listItems.slice(7).join("\n")}`);
+  await expect(page.locator("[data-export-card]")).toHaveCount(2);
+  await expect(page.locator(".overflow-badge")).toHaveCount(0);
+});
+
 test("exports the current card as an exact 900 by 1200 PNG", async ({ page, isMobile }) => {
   test.skip(Boolean(isMobile), "desktop export verification");
   const downloadPromise = page.waitForEvent("download");

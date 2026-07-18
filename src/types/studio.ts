@@ -44,6 +44,7 @@ export interface TemplateConfig {
 
 export interface StudioSettings {
   appearance: "dark" | "light";
+  paginationMode: "auto" | "manual";
   themeId: ThemeId;
   templateId: TemplateId;
   fontSize: number;

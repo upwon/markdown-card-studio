@@ -40,6 +40,7 @@ button { color: inherit; }
 .template-option { width: 100%; display: flex; align-items: center; justify-content: space-between; text-align: left; padding: 10px; border: 1px solid #292f3a; border-radius: 10px; background: #151922; cursor: pointer; }
 .template-option span { display: grid; gap: 3px; }.template-option strong { font-size: 11px; }.template-option small { color: var(--muted); font-size: 9px; }
 .template-option.is-selected { border-color: #758de1; background: #1c2333; }
+.pagination-mode { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }.pagination-mode button { display: grid; gap: 3px; min-width: 0; padding: 9px 8px; border: 1px solid #292f3a; border-radius: 9px; background: #151922; color: var(--text); text-align: left; cursor: pointer; }.pagination-mode button strong { font-size: 10px; }.pagination-mode button small { color: var(--muted); font-size: 8px; line-height: 1.4; }.pagination-mode button.is-selected { border-color: #758de1; background: #1c2333; }.pagination-hint { margin: 8px 1px 0; color: var(--muted); font-size: 8px; }.pagination-hint code { color: #98aef0; font-family: var(--font-mono); }
 .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 5px; }
 .theme-option { display: grid; gap: 5px; justify-items: center; padding: 0; background: transparent; border: 0; cursor: pointer; }
 .theme-swatch { position: relative; width: 42px; height: 32px; border: 1px solid; border-radius: 7px; box-shadow: inset 0 0 0 2px transparent; }.theme-swatch i { position: absolute; width: 15px; height: 4px; bottom: 5px; left: 6px; border-radius: 9px; }
@@ -69,7 +70,7 @@ button { color: inherit; }
 .card-header { border-bottom: 1px solid var(--card-line); }.card-column { font-weight: 700; }.card-mark { display: flex; align-items: center; gap: 9px; color: var(--card-ink); font-weight: 800; }.card-mark i { width: 17px; height: 5px; background: var(--card-accent); border-radius: 5px; }
 .card-content { overflow: hidden; display: flex; flex-direction: column; gap: var(--card-block-gap); padding: var(--card-padding-top) var(--card-padding-x) 28px; }
 .card-footer { border-top: 1px solid var(--card-line); font: 16px var(--font-mono); letter-spacing: .06em; }
-.markdown-block { flex: 0 0 auto; font-size: var(--card-font-size); line-height: var(--card-line-height); overflow-wrap: anywhere; }.markdown-block > :first-child { margin-top: 0; }.markdown-block > :last-child { margin-bottom: 0; }
+.markdown-block { flex: 0 0 auto; min-width: 0; max-width: 100%; font-size: var(--card-font-size); line-height: var(--card-line-height); white-space: normal; word-break: break-word; overflow-wrap: anywhere; }.markdown-block > :first-child { margin-top: 0; }.markdown-block > :last-child { margin-bottom: 0; }
 .markdown-block h1, .markdown-block h2, .markdown-block h3, .markdown-block h4 { color: var(--card-ink); margin: 0; line-height: 1.18; letter-spacing: -.035em; }.markdown-block h1 { font-size: calc(var(--card-font-size) * 2.2 * var(--card-heading-scale)); }.markdown-block h2 { font-size: calc(var(--card-font-size) * 1.55 * var(--card-heading-scale)); }.markdown-block h3 { font-size: calc(var(--card-font-size) * 1.25 * var(--card-heading-scale)); }.markdown-block h4 { font-size: calc(var(--card-font-size) * 1.08); }
 .markdown-block p { margin: 0; }.markdown-block strong { color: var(--card-ink); font-weight: 750; box-shadow: inset 0 -.28em 0 color-mix(in srgb, var(--card-accent) 25%, transparent); }.markdown-block a { color: var(--card-accent); text-decoration-thickness: 2px; text-underline-offset: 4px; }
 .markdown-block blockquote { margin: 0; padding: 22px 26px; border-left: 7px solid var(--card-accent); border-radius: 0 16px 16px 0; background: var(--card-quote); color: var(--card-ink); }.markdown-block ul, .markdown-block ol { margin: 0; padding-left: 1.4em; }.markdown-block li { padding-left: .15em; margin: .15em 0; }.markdown-block li::marker { color: var(--card-accent); font-weight: 800; }
@@ -96,6 +97,7 @@ button { color: inherit; }
 .studio-shell[data-app-theme="light"] .topbar-button.primary,
 .studio-shell[data-app-theme="light"] .mobile-export { border-color: #20242b; background: #20242b; color: #fff; }
 .studio-shell[data-app-theme="light"] .template-option.is-selected { border-color: #6382dc; background: #eaf0ff; }
+.studio-shell[data-app-theme="light"] .pagination-mode button { border-color: #d6dbe4; background: #fff; color: #303640; }.studio-shell[data-app-theme="light"] .pagination-mode button.is-selected { border-color: #6382dc; background: #eaf0ff; }.studio-shell[data-app-theme="light"] .pagination-hint code { color: #315bb9; }
 .studio-shell[data-app-theme="light"] .setting-section { border-color: #dfe3ea; }
 .studio-shell[data-app-theme="light"] .setting-section h2,
 .studio-shell[data-app-theme="light"] .range-field b,
