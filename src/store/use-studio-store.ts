@@ -18,6 +18,7 @@ interface StudioState {
 }
 
 const defaultSettings: StudioSettings = {
+  appearance: "dark",
   themeId: "classic-cream",
   templateId: "deep-reading",
   fontSize: 30,
@@ -47,7 +48,16 @@ export const useStudioStore = create<StudioState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ markdown: state.markdown, settings: state.settings }),
       onRehydrateStorage: () => (state) => state?.setHydrated(true),
-      version: 1,
+      merge: (persisted, current) => {
+        const saved = persisted as Partial<StudioState>;
+        return {
+          ...current,
+          ...saved,
+          settings: { ...defaultSettings, ...saved.settings },
+          hydrated: true,
+        };
+      },
+      version: 2,
     },
   ),
 );

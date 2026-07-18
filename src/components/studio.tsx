@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { Download, Eye, FileDown, FilePlus2, FileUp, LoaderCircle, PanelLeft, Settings2, Sparkles } from "lucide-react";
+import { Download, Eye, FileDown, FilePlus2, FileUp, LoaderCircle, Moon, PanelLeft, Settings2, Sparkles, Sun } from "lucide-react";
 import { toBlob, toPng } from "html-to-image";
 import JSZip from "jszip";
 import { countWords } from "@/core/markdown/parse";
@@ -20,6 +20,7 @@ export function Studio() {
   const settings = useStudioStore((state) => state.settings);
   const updateSettings = useStudioStore((state) => state.updateSettings);
   const activePage = useStudioStore((state) => state.activePage);
+  const appearance = settings.appearance ?? "dark";
   const [pageCount, setPageCount] = useState(1);
   const saveStatus = "已保存";
   const [exportStatus, setExportStatus] = useState("");
@@ -84,11 +85,21 @@ export function Studio() {
   };
 
   return (
-    <main className="studio-shell">
+    <main className="studio-shell" data-app-theme={appearance}>
       <header className="topbar">
         <div className="topbar-brand"><span>Markdown Card Studio</span><em>MVP</em></div>
         <div className="document-stats"><span>{countWords(markdown)} 字</span><i /><span>{pageCount} 页</span></div>
         <div className="topbar-actions">
+          <button
+            type="button"
+            className="topbar-button ghost appearance-toggle"
+            onClick={() => updateSettings({ appearance: appearance === "dark" ? "light" : "dark" })}
+            title={appearance === "dark" ? "切换到浅色界面" : "切换到深色界面"}
+            aria-label={appearance === "dark" ? "切换到浅色界面" : "切换到深色界面"}
+          >
+            {appearance === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            <span>{appearance === "dark" ? "浅色界面" : "深色界面"}</span>
+          </button>
           <button type="button" className="topbar-button ghost" onClick={() => { if (window.confirm("新建文档会覆盖当前内容，确定继续吗？")) resetDocument(); }}><FilePlus2 size={16} /> 新建</button>
           <button type="button" className="topbar-button ghost" onClick={() => fileInputRef.current?.click()}><FileUp size={16} /> 导入</button>
           <input ref={fileInputRef} type="file" accept=".md,text/markdown" hidden onChange={(event) => { void importMarkdown(event.target.files?.[0]); event.currentTarget.value = ""; }} />

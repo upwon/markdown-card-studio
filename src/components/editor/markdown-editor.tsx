@@ -27,21 +27,22 @@ const tools = [
 export function MarkdownEditor({ saveStatus }: { saveStatus: string }) {
   const markdown = useStudioStore((state) => state.markdown);
   const setMarkdown = useStudioStore((state) => state.setMarkdown);
+  const appearance = useStudioStore((state) => state.settings.appearance ?? "dark");
   const editorRef = useRef<EditorViewType | null>(null);
   const extensions = useMemo(() => [
     lineNumbers(), history(), markdownLanguage(),
     keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, indentWithTab]),
     EditorView.lineWrapping,
     EditorView.theme({
-      "&": { height: "100%", backgroundColor: "transparent", fontSize: "14px" },
-      ".cm-scroller": { fontFamily: '"Geist Mono", ui-monospace, monospace', lineHeight: "1.7" },
+      "&": { height: "100%", minHeight: "0", backgroundColor: "transparent", color: appearance === "light" ? "#343942" : "#cdd4df", fontSize: "14px" },
+      ".cm-scroller": { fontFamily: '"Geist Mono", ui-monospace, monospace', lineHeight: "1.7", overflow: "auto", overscrollBehavior: "contain", scrollbarGutter: "stable", touchAction: "pan-y" },
       ".cm-content": { padding: "22px 12px 120px" },
-      ".cm-gutters": { backgroundColor: "transparent", borderRight: "1px solid #262a33", color: "#596170" },
-      ".cm-activeLine, .cm-activeLineGutter": { backgroundColor: "rgba(255,255,255,.035)" },
-      ".cm-cursor": { borderLeftColor: "#82aaff" },
-      ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": { backgroundColor: "#28476e !important" },
+      ".cm-gutters": { backgroundColor: "transparent", borderRight: `1px solid ${appearance === "light" ? "#d7dce5" : "#262a33"}`, color: appearance === "light" ? "#9aa2af" : "#596170" },
+      ".cm-activeLine, .cm-activeLineGutter": { backgroundColor: appearance === "light" ? "rgba(40,75,130,.055)" : "rgba(255,255,255,.035)" },
+      ".cm-cursor": { borderLeftColor: appearance === "light" ? "#245edb" : "#82aaff" },
+      ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": { backgroundColor: `${appearance === "light" ? "#cbdcf8" : "#28476e"} !important` },
     }),
-  ], []);
+  ], [appearance]);
 
   const insert = useCallback((before: string, after: string, placeholder: string) => {
     const view = editorRef.current;

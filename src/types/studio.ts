@@ -43,6 +43,7 @@ export interface TemplateConfig {
 }
 
 export interface StudioSettings {
+  appearance: "dark" | "light";
   themeId: ThemeId;
   templateId: TemplateId;
   fontSize: number;

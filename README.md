@@ -8,6 +8,8 @@ A local-first Markdown editor for creating beautifully paginated 3:4 social medi
 - Live 900 × 1200 card preview and automatic pagination
 - Explicit page breaks with `<!-- pagebreak -->`
 - Two typography templates and eight light/dark themes
+- Persistent light/dark application appearance, independent of card themes
+- Independently scrollable long-document editor
 - Local browser persistence
 - Markdown import and download
 - Current-page PNG and all-pages ZIP export
