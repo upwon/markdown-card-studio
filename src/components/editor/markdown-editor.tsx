@@ -52,7 +52,7 @@ export function MarkdownEditor({ saveStatus }: { saveStatus: string }) {
       keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, indentWithTab]),
       EditorView.lineWrapping,
       EditorView.theme({
-        "&": { height: "100%", minHeight: "0", backgroundColor: "transparent", color: palette.text, fontSize: "14px" },
+        "&": { height: "100%", minHeight: "0", backgroundColor: appearance === "light" ? "#ffffff" : "#0f1217", color: palette.text, fontSize: "14px" },
         ".cm-scroller": { fontFamily: '"Geist Mono", ui-monospace, monospace', lineHeight: "1.7", overflow: "auto", overscrollBehavior: "contain", scrollbarGutter: "stable", touchAction: "pan-y" },
         ".cm-content": { padding: "22px 12px 120px", caretColor: palette.accent },
         ".cm-gutters": { backgroundColor: "transparent", borderRight: `1px solid ${appearance === "light" ? "#d7dce5" : "#262a33"}`, color: appearance === "light" ? "#7c8797" : "#8994a5" },
@@ -92,7 +92,7 @@ export function MarkdownEditor({ saveStatus }: { saveStatus: string }) {
         <span className="save-state"><i /> {saveStatus}</span>
       </div>
       <div className="editor-surface" data-testid="markdown-editor">
-        <CodeMirror value={markdown} height="100%" extensions={extensions} onChange={setMarkdown} onCreateEditor={(view) => { editorRef.current = view; }} basicSetup={{ foldGutter: true, highlightActiveLine: true, bracketMatching: true, closeBrackets: true, syntaxHighlighting: false }} />
+        <CodeMirror value={markdown} height="100%" theme="none" extensions={extensions} onChange={setMarkdown} onCreateEditor={(view) => { editorRef.current = view; }} basicSetup={{ foldGutter: true, highlightActiveLine: true, bracketMatching: true, closeBrackets: true, syntaxHighlighting: false }} />
       </div>
     </section>
   );

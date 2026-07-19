@@ -9,7 +9,7 @@ async function minimumEditorContrast(page: Page) {
       .map((channel) => channel / 255)
       .map((channel) => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4)
       .reduce((sum, channel, index) => sum + channel * [0.2126, 0.7152, 0.0722][index], 0);
-    const background = parseRgb(getComputedStyle(editor.closest(".editor-pane")!).backgroundColor);
+    const background = parseRgb(getComputedStyle(editor).backgroundColor);
     const backgroundLuminance = luminance(background);
     const nodes = [editor, ...editor.querySelectorAll(".cm-line span")];
     return Math.min(...nodes.map((node) => {
@@ -72,8 +72,10 @@ test("keeps Markdown syntax readable in both application appearances", async ({ 
   await page.keyboard.press(process.platform === "darwin" ? "Meta+A" : "Control+A");
   await page.keyboard.insertText("# 清晰标题\n\n> 清晰引用\n\n普通正文、**重点文字**、[清晰链接](https://example.com) 和 `代码`。\n\n---");
 
+  await expect(page.locator(".cm-editor")).toHaveCSS("background-color", "rgb(15, 18, 23)");
   await expect.poll(() => minimumEditorContrast(page)).toBeGreaterThanOrEqual(4.5);
   await page.getByRole("button", { name: "切换到浅色界面" }).click();
+  await expect(page.locator(".cm-editor")).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await expect.poll(() => minimumEditorContrast(page)).toBeGreaterThanOrEqual(4.5);
 });
 
