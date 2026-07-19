@@ -23,6 +23,8 @@ const defaultSettings: StudioSettings = {
   themeId: "classic-cream",
   templateId: "deep-reading",
   fontSize: 30,
+  headingFontId: "system-sans",
+  bodyFontId: "system-sans",
   lineHeight: 1.72,
   paddingX: 74,
   accentOverride: "",
@@ -58,7 +60,7 @@ export const useStudioStore = create<StudioState>()(
           hydrated: true,
         };
       },
-      version: 3,
+      version: 4,
     },
   ),
 );

@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { Download, Eye, FileDown, FilePlus2, FileUp, LoaderCircle, Moon, PanelLeft, Settings2, Sparkles, Sun } from "lucide-react";
-import { toBlob, toPng } from "html-to-image";
+import { getFontEmbedCSS, toBlob, toPng } from "html-to-image";
 import JSZip from "jszip";
 import { countWords } from "@/core/markdown/parse";
 import { downloadBlob, downloadText } from "@/lib/download";
@@ -12,6 +12,20 @@ import { CardPreview } from "./preview/card-preview";
 import { SettingsPanel } from "./settings/settings-panel";
 
 type MobileTab = "settings" | "editor" | "preview";
+
+async function waitForCardFonts() {
+  const links = Array.from(document.querySelectorAll<HTMLLinkElement>("link[data-card-font]"));
+  await Promise.all(links.map((link) => {
+    if (link.sheet) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      const done = () => resolve();
+      link.addEventListener("load", done, { once: true });
+      link.addEventListener("error", done, { once: true });
+      window.setTimeout(done, 5000);
+    });
+  }));
+  await document.fonts?.ready;
+}
 
 export function Studio() {
   const markdown = useStudioStore((state) => state.markdown);
@@ -40,8 +54,8 @@ export function Studio() {
     setExportStatus("正在导出当前页…");
     const restore = prepareCard(card);
     try {
-      await document.fonts?.ready;
-      const dataUrl = await toPng(card, { width: 900, height: 1200, pixelRatio: 1, cacheBust: true });
+      await waitForCardFonts();
+      const dataUrl = await toPng(card, { width: 900, height: 1200, pixelRatio: 1, cacheBust: true, preferredFontFormat: "woff2" });
       const anchor = document.createElement("a");
       anchor.href = dataUrl;
       anchor.download = `markdown-card-${String(activePage + 1).padStart(2, "0")}.png`;
@@ -59,12 +73,13 @@ export function Studio() {
     setExportStatus(`正在导出 0 / ${allCards.length}`);
     const zip = new JSZip();
     try {
-      await document.fonts?.ready;
+      await waitForCardFonts();
+      const fontEmbedCSS = await getFontEmbedCSS(allCards[0], { cacheBust: true, preferredFontFormat: "woff2" });
       for (let index = 0; index < allCards.length; index += 1) {
         const card = allCards[index];
         const restore = prepareCard(card);
         let blob: Blob | null = null;
-        try { blob = await toBlob(card, { width: 900, height: 1200, pixelRatio: 1, cacheBust: true }); } finally { restore(); }
+        try { blob = await toBlob(card, { width: 900, height: 1200, pixelRatio: 1, cacheBust: true, preferredFontFormat: "woff2", fontEmbedCSS }); } finally { restore(); }
         if (!blob) throw new Error(`第 ${index + 1} 页生成失败`);
         zip.file(`markdown-card-${String(index + 1).padStart(2, "0")}.png`, blob);
         setExportStatus(`正在导出 ${index + 1} / ${allCards.length}`);

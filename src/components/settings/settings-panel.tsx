@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Files, Palette, SlidersHorizontal, Type } from "lucide-react";
+import { cardFonts, getCardFont } from "@/config/fonts";
 import { templates } from "@/config/templates";
 import { themes } from "@/config/themes";
 import { useStudioStore } from "@/store/use-studio-store";
@@ -35,6 +36,23 @@ export function SettingsPanel() {
       </section>
       <section className="setting-section">
         <h2><Type size={15} /> 文字与留白</h2>
+        <div className="font-controls">
+          <label className="font-field">
+            <span>标题字体</span>
+            <select aria-label="标题字体" value={settings.headingFontId} onChange={(event) => update("headingFontId", event.target.value as StudioSettings["headingFontId"])}>
+              {cardFonts.map((font) => <option value={font.id} key={font.id}>{font.name}</option>)}
+            </select>
+            <small style={{ fontFamily: getCardFont(settings.headingFontId).family }}>把复杂知识，写成好看的卡片</small>
+          </label>
+          <label className="font-field">
+            <span>正文字体</span>
+            <select aria-label="正文字体" value={settings.bodyFontId} onChange={(event) => update("bodyFontId", event.target.value as StudioSettings["bodyFontId"])}>
+              {cardFonts.map((font) => <option value={font.id} key={font.id}>{font.name}</option>)}
+            </select>
+            <small style={{ fontFamily: getCardFont(settings.bodyFontId).family }}>{getCardFont(settings.bodyFontId).description}</small>
+          </label>
+        </div>
+        <p className="font-license-hint">内置开源字体采用 OFL 1.1 · <a href="/font-licenses" target="_blank" rel="noreferrer">查看授权</a></p>
         <RangeField label="正文字号" value={settings.fontSize} min={24} max={38} step={1} suffix="px" onChange={(value) => update("fontSize", value)} />
         <RangeField label="行高" value={settings.lineHeight} min={1.35} max={2.1} step={0.05} onChange={(value) => update("lineHeight", value)} />
         <RangeField label="左右边距" value={settings.paddingX} min={54} max={120} step={2} suffix="px" onChange={(value) => update("paddingX", value)} />

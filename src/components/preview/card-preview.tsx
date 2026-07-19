@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { getCardFont } from "@/config/fonts";
 import { getTemplate } from "@/config/templates";
 import { getTheme } from "@/config/themes";
 import { parseMarkdown } from "@/core/markdown/parse";
@@ -32,6 +33,9 @@ export function CardPreview({ onPageCount }: { onPageCount: (count: number) => v
   const template = getTemplate(settings.templateId);
   const accent = settings.accentOverride || theme.accent;
   const paginationMode = settings.paginationMode ?? "auto";
+  const headingFont = getCardFont(settings.headingFontId);
+  const bodyFont = getCardFont(settings.bodyFontId);
+  const fontStylesheets = Array.from(new Set([headingFont.stylesheet, bodyFont.stylesheet].filter((href): href is string => Boolean(href))));
 
   const flowBlocks = useMemo(() => paginationMode === "auto"
     ? splitOversizedBlocks(blocks, {
@@ -55,13 +59,15 @@ export function CardPreview({ onPageCount }: { onPageCount: (count: number) => v
     "--card-code-text": theme.codeText,
     "--card-shadow": theme.shadow,
     "--card-font-size": `${settings.fontSize}px`,
+    "--card-heading-font": headingFont.family,
+    "--card-body-font": bodyFont.family,
     "--card-line-height": String(settings.lineHeight),
     "--card-padding-x": `${settings.paddingX}px`,
     "--card-padding-top": `${template.paddingTop}px`,
     "--card-block-gap": `${template.blockGap}px`,
     "--card-radius": `${template.radius}px`,
     "--card-heading-scale": String(template.headingScale),
-  }), [accent, settings, template, theme]);
+  }), [accent, bodyFont.family, headingFont.family, settings, template, theme]);
 
   const pages = useMemo(() => paginateBlocks(flowBlocks, {
     capacity: template.contentHeight,
@@ -103,6 +109,7 @@ export function CardPreview({ onPageCount }: { onPageCount: (count: number) => v
 
   return (
     <div className="preview-stage" data-testid="preview-stage">
+      {fontStylesheets.map((href) => <link data-card-font rel="stylesheet" href={href} key={href} />)}
       <div className="measure-stage" aria-hidden ref={measureRef} style={style}>
         <div className="card-measure-content">
           {flowBlocks.filter((block) => !block.forceBreak).map((block) => (
@@ -116,7 +123,7 @@ export function CardPreview({ onPageCount }: { onPageCount: (count: number) => v
         {pages.map((page, index) => (
           <button type="button" className={`card-preview-wrap ${activePage === index ? "is-active" : ""}`} style={{ width: 900 * settings.zoom, height: 1200 * settings.zoom }} onClick={() => setActivePage(index)} key={page.id} aria-label={`选择第 ${index + 1} 页`}>
             <article className="export-card" data-export-card data-page={index + 1} style={{ ...style, transform: `scale(${settings.zoom})` }}>
-              <header className="card-header"><span className="card-column">{settings.column}</span><span className="card-mark"><i /> M</span></header>
+              <header className="card-header"><span className="card-column">{settings.column}</span><span className="card-mark" title="Markdown"><i /> MD</span></header>
               <main className="card-content"><CardBody blocks={page.blocks} /></main>
               <footer className="card-footer"><span>{settings.account}</span><span>{String(index + 1).padStart(2, "0")} / {String(pages.length).padStart(2, "0")}</span></footer>
               {page.overflow && <span className="overflow-badge">{paginationMode === "manual" ? "本页内容超出卡片，请插入分页符" : "单个内容块过高，请拆分内容或调小字号"}</span>}

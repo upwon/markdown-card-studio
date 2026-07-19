@@ -10,6 +10,13 @@ export type ThemeId =
 
 export type TemplateId = "deep-reading" | "warm-paper";
 
+export type CardFontId =
+  | "system-sans"
+  | "noto-sans-sc"
+  | "noto-serif-sc"
+  | "lxgw-wenkai"
+  | "lxgw-marker-gothic";
+
 export interface ThemeTokens {
   id: ThemeId;
   name: string;
@@ -48,6 +55,8 @@ export interface StudioSettings {
   themeId: ThemeId;
   templateId: TemplateId;
   fontSize: number;
+  headingFontId: CardFontId;
+  bodyFontId: CardFontId;
   lineHeight: number;
   paddingX: number;
   accentOverride: string;
